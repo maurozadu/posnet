@@ -19,7 +19,9 @@ class ClientFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'dni' => $this->faker->unique()->randomNumber(8),
+            'first_name' => $this->faker->firstName,
+            'last_name' => $this->faker->lastName,
         ];
     }
 }

@@ -19,7 +19,12 @@ class CreditCardFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'client_id' => ClientFactory::new(),
+            'card_type' => $this->faker->randomElement(['Visa', 'AMEX']),
+            'bank_name' => $this->faker->company,
+            'card_number' => $this->faker->unique()->randomNumber(8),
+            'limit' => $this->faker->randomFloat(2, 1, 1000),
+            'available_limit' => $this->faker->randomFloat(2, 1000, 10000),
         ];
     }
 }

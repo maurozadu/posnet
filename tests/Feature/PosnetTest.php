@@ -6,36 +6,63 @@ namespace Tests\Feature;
 
 use App\Models\Client;
 use App\Models\CreditCard;
+use Database\Factories\CreditCardFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class PosnetTest extends TestCase
 {
     use RefreshDatabase;
+    use WithFaker;
 
-    public function testPaymentSuccess()
+    public $ticketJsonFormat = [
+        'ticket' => [
+            'client_name',
+            'total_amount',
+            'installment_amount',
+        ],
+    ];
+
+    public function testPaymentSuccess(): void
     {
-        $client = Client::create([
-            'dni' => '12345678',
-            'first_name' => 'John',
-            'last_name' => 'Doe',
-        ]);
-
-        $card = CreditCard::create([
-            'client_id' => $client->id,
-            'card_type' => 'Visa',
-            'bank_name' => 'BankX',
-            'card_number' => '12345678',
-            'limit' => 1000.00,
-            'available_limit' => 1000.00,
-        ]);
-
+        $card = CreditCardFactory::new(['available_limit' => 2000])->create();
         $response = $this->postJson('/api/process-payment', [
-            'card_number' => '12345678',
-            'amount' => 100,
+            'card_number' => $card->card_number,
+            'amount' => 1000,
             'installments' => 1,
         ]);
-        // echo $response->getContent();
         $response->assertStatus(200);
+        $response->assertJsonStructure($this->ticketJsonFormat);
+    }
+
+    public function testPaymentSuccessWithInstallments()
+    {
+        $card = CreditCardFactory::new()->create();
+        $installments = 3;
+        $response = $this->postJson('/api/process-payment', [
+            'card_number' => $card->card_number,
+            'amount' => 1000,
+            'installments' => $installments,
+        ]);
+        $response->assertStatus(200);
+        $response->assertJsonStructure($this->ticketJsonFormat);
+        $ticket = $response->json('ticket');
+        $expectedTotalAmount = 1000 * 1.06;
+        $expectedInstallmentAmount = $expectedTotalAmount / $installments;
+        $this->assertEquals($expectedTotalAmount, $ticket['total_amount']);
+        $this->assertEquals($expectedInstallmentAmount, $ticket['installment_amount']);
+    }
+
+    public function testPaymentFailedInsufficientFunds()
+    {
+        $card = CreditCardFactory::new(['available_limit' => 900])->create();
+        $response = $this->postJson('/api/process-payment', [
+            'card_number' => $card->card_number,
+            'amount' => 1000,
+            'installments' => 1,
+        ]);
+        $response->assertStatus(400);
+        $response->assertJson(['error' => 'Insufficient available limit']);
     }
 }
