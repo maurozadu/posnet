@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\CreditCard;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class PosnetController extends Controller
 {
-    public function registerCard(Request $request)
+    public function registerCard(Request $request): JsonResponse
     {
         $request->validate([
             'dni' => 'required|string|max:10',
@@ -37,7 +38,7 @@ class PosnetController extends Controller
         return response()->json(['message' => 'Card registered successfully!'], 201);
     }
 
-    public function doPayment(Request $request)
+    public function doPayment(Request $request): JsonResponse
     {
         $request->validate([
             'card_number' => 'required|digits:8|exists:credit_cards,card_number',
@@ -46,6 +47,10 @@ class PosnetController extends Controller
         ]);
 
         $card = CreditCard::where('card_number', $request->card_number)->first();
+
+        if (!$card) {
+            return response()->json(['error' => 'Card not found'], 404);
+        }
 
         $totalAmount = $request->amount;
         if ($request->installments > 1) {
@@ -59,6 +64,10 @@ class PosnetController extends Controller
         // Deduct from available limit
         $card->available_limit -= $totalAmount;
         $card->save();
+
+        if (empty($card->client)) {
+            return response()->json(['error' => 'Client not found'], 404);
+        }
 
         // Generate ticket
         $ticket = [

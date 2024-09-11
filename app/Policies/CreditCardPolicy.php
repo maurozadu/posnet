@@ -13,7 +13,7 @@ class CreditCardPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -21,7 +21,7 @@ class CreditCardPolicy
      */
     public function view(User $user, CreditCard $creditCard): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -29,7 +29,7 @@ class CreditCardPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -37,7 +37,7 @@ class CreditCardPolicy
      */
     public function update(User $user, CreditCard $creditCard): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -45,7 +45,7 @@ class CreditCardPolicy
      */
     public function delete(User $user, CreditCard $creditCard): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -53,7 +53,7 @@ class CreditCardPolicy
      */
     public function restore(User $user, CreditCard $creditCard): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -61,6 +61,6 @@ class CreditCardPolicy
      */
     public function forceDelete(User $user, CreditCard $creditCard): bool
     {
-        //
+        return true;
     }
 }

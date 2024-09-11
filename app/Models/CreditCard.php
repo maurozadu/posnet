@@ -4,10 +4,13 @@ namespace App\Models;
 
 use App\Models\Client;
 use Illuminate\Database\Eloquent\Model;
+use Database\Factories\CreditCardFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CreditCard extends Model
 {
+    /** @use HasFactory<CreditCardFactory> */
     use HasFactory;
 
     public $fillable = [
@@ -19,7 +22,10 @@ class CreditCard extends Model
         'available_limit',
     ];
 
-    public function client()
+    /**
+     * @return BelongsTo<Client,CreditCard>
+     */
+    public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
     }
