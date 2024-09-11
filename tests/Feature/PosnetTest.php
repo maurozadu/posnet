@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use App\Models\Client;
 use App\Models\CreditCard;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class PosnetTest extends TestCase
 {
@@ -16,7 +18,7 @@ class PosnetTest extends TestCase
         $client = Client::create([
             'dni' => '12345678',
             'first_name' => 'John',
-            'last_name' => 'Doe'
+            'last_name' => 'Doe',
         ]);
 
         $card = CreditCard::create([
@@ -31,7 +33,7 @@ class PosnetTest extends TestCase
         $response = $this->postJson('/api/process-payment', [
             'card_number' => '12345678',
             'amount' => 100,
-            'installments' => 1
+            'installments' => 1,
         ]);
         // echo $response->getContent();
         $response->assertStatus(200);

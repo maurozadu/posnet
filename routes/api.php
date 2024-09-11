@@ -1,7 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+declare(strict_types=1);
+
 use App\Http\Controllers\PosnetController;
+use Illuminate\Support\Facades\Route;
 
 Route::post('/register-card', [PosnetController::class, 'registerCard']);
 Route::post('/process-payment', [PosnetController::class, 'doPayment']);

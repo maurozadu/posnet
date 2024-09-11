@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\CreditCard;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PosnetController extends Controller
 {
@@ -48,7 +50,7 @@ class PosnetController extends Controller
 
         $card = CreditCard::where('card_number', $request->card_number)->first();
 
-        if (!$card) {
+        if (! $card) {
             return response()->json(['error' => 'Card not found'], 404);
         }
 
@@ -71,7 +73,7 @@ class PosnetController extends Controller
 
         // Generate ticket
         $ticket = [
-            'client_name' => $card->client->first_name . ' ' . $card->client->last_name,
+            'client_name' => $card->client->first_name.' '.$card->client->last_name,
             'total_amount' => $totalAmount,
             'installment_amount' => $totalAmount / $request->installments,
         ];
